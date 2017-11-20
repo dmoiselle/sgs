@@ -1,11 +1,19 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import Http404
+
+from sgs.models import Shipment
 
 def index(request):
-    return HttpResponse('<p>In index view</p>')
+    shipments = Shipment.objects.all()
+    return render(request, 'sgs/index.html', {
+        'shipments': shipments,
+    })
 
 def shipment_detail(request, id):
-    return HttpResponse('<p>In shipment_detail view with id {0}</p>'.format(id))
-
-def upload_detail(request, id):
-    return HttpResponse('<p>In upload_detail view with id {0}</p>'.format(id))
+    try:
+        shipment = Shipment.objects.get(id=id)
+    except Shipment.DoesNotExist:
+        raise Http404('This shipment does not exist')
+    return render(request, 'sgs/shipment_detail.html', {
+        'shipment':shipment,
+    })
